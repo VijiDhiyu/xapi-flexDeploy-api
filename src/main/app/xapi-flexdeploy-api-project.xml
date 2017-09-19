@@ -1,0 +1,40 @@
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit-soap="http://www.mulesoft.org/schema/mule/apikit-soap" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/mule/apikit-soap/current/mule-apikit-soap.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+  <http:listener-config name="api-httpListenerConfig" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+  <apikit-soap:config name="/fdservice_client_api_invoke/FDService_pt/api-config" wsdlUrl="XAPI_FDRequest_SOAP_XML.wsdl" serviceName="fdservice_client_api_invoke" portName="FDService_pt" doc:name="APIkit SOAP: Configuration"/>
+    <http:request-config name="HTTP_Request_Configuration" host="localhost" port="9081" doc:name="HTTP Request Configuration"/>
+  <flow name="api-main">
+    <http:listener path="/xapiwrapper" config-ref="api-httpListenerConfig" doc:name="xapi http Listener" >
+            <http:error-response-builder>
+                <http:header headerName="Content-Type" value="application/xml"/>
+            </http:error-response-builder>
+        </http:listener>
+    <apikit-soap:router config-ref="/fdservice_client_api_invoke/FDService_pt/api-config" doc:name="SOAP Router"/>
+  </flow>
+  <flow name="FDAPIInvocation:/fdservice_client_api_invoke/FDService_pt/api-config">
+        <dw:transform-message doc:name="Transform Message" metadata:id="f5cc732d-774c-47fa-b80d-824e1401f1be">
+            <dw:input-payload doc:sample="sample_data\FDRequestMessage.xml"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 www.flexagon.com/MuleMaterial/Assignment/SOAPAssignment/
+---
+{
+	FDRequestMessage: {
+		qualifiedProjectName: payload.FDRequestMessage.qualifiedProjectName,
+		PropertyValue: payload.FDRequestMessage.PropertyValue,
+		ResourceMethodName: payload.FDRequestMessage.ResourceMethodName
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/flexDeploy" method="POST" doc:name="HTTP invoke Internal flow">
+            <http:request-builder>
+                <http:header headerName="Content-Type" value="application/xml"/>
+            </http:request-builder>
+        </http:request>
+
+  </flow>
+</mule>

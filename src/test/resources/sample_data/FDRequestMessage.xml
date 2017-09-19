@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:FDRequestMessage xmlns:ns0="www.flexagon.com/MuleMaterial/Assignment/SOAPAssignment/flexDeployReq_xapiWrapper.xsd">
+  <ns0:qualifiedProjectName>asasa</ns0:qualifiedProjectName>
+  <ns0:PropertyValue>23232</ns0:PropertyValue>
+  <ns0:ResourceMethodName>bbbb</ns0:ResourceMethodName>
+</ns0:FDRequestMessage>

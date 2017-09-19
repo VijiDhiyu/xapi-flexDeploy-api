@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"
+			targetNamespace="www.flexagon.com/MuleMaterial/Assignment/SOAPAssignment/flexDeployReq_xapiWrapper.xsd" 
+			xmlns:fdr="www.flexagon.com/MuleMaterial/Assignment/SOAPAssignment/flexDeployReq_xapiWrapper.xsd">
+	
+		<xsd:annotation>
+			<xsd:documentation>XML schema for wrapping FlexDeploy service Request</xsd:documentation>
+		</xsd:annotation>
+	
+	<xsd:element name="FDRequestMessage" type="fdr:FDRequestMessageType"/>
+	<xsd:element name="ResponseMessage" type="fdr:ResponseMessageType"/>
+	<xsd:element name="FaultMessage" type="fdr:FaultType"/>
+
+	<xsd:complexType name="FDRequestMessageType">
+		<xsd:sequence>     
+			<xsd:element name="qualifiedProjectName" type="xsd:string"/>
+			<xsd:element name="PropertyValue" type="xsd:string"/>
+			<xsd:element name="ResourceMethodName">	
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="buildProject"/>
+						<xsd:enumeration value="deployProject"/>
+						<xsd:enumeration value="deployMany"/>
+						<xsd:enumeration value="updateProject"/>
+						<xsd:enumeration value="buildPartial"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="ResponseMessageType">
+		<xsd:sequence>
+			<xsd:element name="Status" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="FaultType">
+		<xsd:sequence>
+			<xsd:element name="ErrorDescription" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
