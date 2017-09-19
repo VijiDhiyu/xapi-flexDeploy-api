@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <flow name="xapi-passthrough-callFlow">
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 www.flexagon.com/MuleMaterial/Assignment/SOAPAssignment/
+---
+{
+	FDRequestMessage: {
+		qualifiedProjectName: payload.FDRequestMessage.qualifiedProjectName,
+		PropertyValue: payload.FDRequestMessage.PropertyValue,
+		ResourceMethodName: payload.FDRequestMessage.ResourceMethodName
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/flexDeploy" method="POST" doc:name="HTTP invoke Internal flow">
+            <http:request-builder>
+                <http:header headerName="Content-Type" value="application/xml"/>
+            </http:request-builder>
+        </http:request>
+    </flow>
+</mule>
