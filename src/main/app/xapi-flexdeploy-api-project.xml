@@ -1,24 +1,27 @@
-<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit-soap="http://www.mulesoft.org/schema/mule/apikit-soap" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:api-platform-gw="http://www.mulesoft.org/schema/mule/api-platform-gw" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit-soap="http://www.mulesoft.org/schema/mule/apikit-soap" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 http://www.mulesoft.org/schema/mule/apikit-soap http://www.mulesoft.org/schema/mule/apikit-soap/current/mule-apikit-soap.xsd
-http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/api-platform-gw http://www.mulesoft.org/schema/mule/api-platform-gw/current/mule-api-platform-gw.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
   <http:listener-config name="api-httpListenerConfig" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
   <apikit-soap:config name="/fdservice_client_api_invoke/FDService_pt/api-config" wsdlUrl="XAPI_FDRequest_SOAP_XML.wsdl" serviceName="fdservice_client_api_invoke" portName="FDService_pt" doc:name="APIkit SOAP: Configuration"/>
     <http:request-config name="HTTP_Request_Configuration" host="localhost" port="9084" doc:name="HTTP Request Configuration" responseTimeout="60000"/>
+    <api-platform-gw:api apiName="xapiFD" version="1.0-DEV" flowRef="api-main" create="true" doc:name="API Autodiscovery">
+        <api-platform-gw:description>API to invoke flexDeploy tool's build/deploy project operations.</api-platform-gw:description>
+    </api-platform-gw:api>
 
   <flow name="api-main">
     <http:listener path="/xapiwrapper" config-ref="api-httpListenerConfig" doc:name="xapi http Listener" allowedMethods="POST">
             <http:error-response-builder>
                 <http:header headerName="Content-Type" value="application/xml"/>
+
             </http:error-response-builder>
         </http:listener>
     <apikit-soap:router config-ref="/fdservice_client_api_invoke/FDService_pt/api-config" doc:name="SOAP Router"/>
   </flow>
     <flow name="FDAPIInvocation:/fdservice_client_api_invoke/FDService_pt/api-config">
-        <flow-ref name="xapi-passthrough-callFlow" doc:name="xapi-passthrough-callFlow"/>
-    </flow>
-    <flow name="flexdeploy-api-passthrough-Flow">
         <dw:transform-message doc:name="Transform Message" metadata:id="f5cc732d-774c-47fa-b80d-824e1401f1be">
             <dw:input-payload doc:sample="sample_data\FDRequestMessage.xml"/>
             <dw:set-payload><![CDATA[%dw 1.0
